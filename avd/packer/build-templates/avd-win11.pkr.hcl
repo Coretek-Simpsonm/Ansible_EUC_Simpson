@@ -105,16 +105,16 @@ source "azure-arm" "avd_w11" {
 
  # virtual_network_name                   = "github-runner-vnet"
  # virtual_network_subnet_name            = "default"
- # virtual_network_resource_group_name    = "Packer"
+ # virtual_network_resource_group_name    = "RG_Simpson_Ansible"
 
   # Skip image creation for PR check
   skip_create_image = var.skip_create_image
   shared_image_gallery_destination {
     subscription        = "${var.subscription_id}"
-    gallery_name        = "avd_images"
+    gallery_name        = "SimpsonGallery"
     image_name          = "avd_win11"
     replication_regions = ["eastus"]
-    resource_group      = "Packer"
+    resource_group      = "RG_Simpson_Ansible"
     image_version       = var.image_version
     specialized         = false
   }
