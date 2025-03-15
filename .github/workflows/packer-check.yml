@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   Windows-11:
-    uses: coretek/Ansible_EUC/.github/workflows/packer-check-job.yml@main
+    uses: coretek/Ansible_EUC_Simpson/.github/workflows/packer-check-job.yml@main
     with:
       build-template: avd-win11.pkr.hcl
       version: ${{ github.event.inputs.version }}
