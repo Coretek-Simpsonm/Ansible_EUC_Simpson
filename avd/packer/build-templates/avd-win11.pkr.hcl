@@ -33,7 +33,7 @@ variable "tenant_id" {
 
 variable "github_source" {
   type    = string
-  default = "coretek/Ansible_EUC"
+  default = "Coretek-Simpsonm/Ansible_EUC_Simpson"
 }
 
 variable "git_commit_sha" {
