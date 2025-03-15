@@ -1,0 +1,7 @@
+---
+- name: Install Python 3.11
+  win_chocolatey:
+    name: python
+    state: present
+    version: 3.11.9
+    choco_args: --ignore-checksums

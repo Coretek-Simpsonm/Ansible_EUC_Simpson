@@ -1,0 +1,27 @@
+---
+- name: Ensure the required NuGet package provider version is installed
+  win_shell: Get-PackageProvider -Name Nuget -ForceBootstrap -Verbose -ErrorAction Stop
+
+- name: Trust the PS Gallery
+  win_shell: Set-PSRepository -InstallationPolicy Trusted -Name PSGallery
+
+- name: Get the lastest powershell package modules to support lastest features
+  win_shell: Install-Module {{ item }} -AllowClobber -Force
+  loop:
+    - PowerShellGet
+    - PackageManagement
+
+- name: Install Microsoft.Graph
+  win_psmodule:
+    name: Microsoft.Graph
+    state: present
+
+- name: Install ExchangeOnlineManagement
+  win_psmodule:
+    name: ExchangeOnlineManagement
+    state: present
+
+- name: Install AzureAD
+  win_psmodule:
+    name: AzureAD
+    state: present

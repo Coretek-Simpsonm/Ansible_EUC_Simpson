@@ -1,0 +1,87 @@
+name: 'Packer Deployment Job'
+
+on:
+  workflow_call:
+    inputs:
+      build-template:
+        required: true
+        type: string
+      version:
+        required: true  # Make version required
+        type: string
+        description: "Version format must be YYYY.MM.DD (e.g., 2024.02.20)"
+
+env:
+  packer_build_template: ${{ inputs.build-template }}
+  version: ${{ inputs.version }}
+
+jobs:
+  hcp-packer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: avd/packer
+    name: Packer Build
+    steps:
+      - name: Checkout Ansible Repository
+        uses: actions/checkout@v3
+        
+      - name: Validate Version Format
+        run: |
+          if ! [[ "${{ inputs.version }}" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$ ]]; then
+            echo "ERROR: Version must be in YYYY.MM.DD format (e.g., 2024.02.20)."
+            exit 1
+          fi
+          
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: "latest"
+
+      - name: Initialize Packer
+        id: init
+        run: packer init build-templates/${{ env.packer_build_template }}
+
+      - name: Validate Packer Template
+        id: validate
+        run: packer validate build-templates/${{ env.packer_build_template }}
+
+      # - name: Create EUC Collection requirements.yaml
+      #   run: |
+      #     cat <<EOF > requirements.yaml
+      #     ---
+      #     collections:
+      #       - name: coretek.euc
+      #         source: git+https://coretek-machine-user-avm:${{ secrets.ANSIBLE_COLLECTION_PAT }}@github.com/coretek/ansible.git#/euc/
+      #         type: git
+      #         version: main
+      #     EOF
+
+      # - name: Install Ansible Collections
+      #   run: |
+      #     ansible-galaxy collection install -r requirements.yaml
+        
+      - name: Build Packer Image
+        id: build-image
+        run: |
+          IMAGE_VERSION="${{ env.version }}"
+          SKIP_CREATE_IMAGE="false"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            SKIP_CREATE_IMAGE="true"
+          fi
+          packer build -color=false -force \
+            -var 'git_commit_sha=${{ github.sha }}' \
+            -var 'github_source=${{ github.repository }}' \
+            -var "skip_create_image=$SKIP_CREATE_IMAGE" \
+            -var "image_version=$IMAGE_VERSION" \
+            -var "client_id=${{ secrets.ARM_CLIENT_ID }}" \
+            -var "client_secret=${{ secrets.ARM_CLIENT_SECRET }}" \
+            -var "subscription_id=${{ secrets.ARM_SUBSCRIPTION_ID }}" \
+            -var "tenant_id=${{ secrets.ARM_TENANT_ID }}" \
+            build-templates/${{ env.packer_build_template }}
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}

@@ -1,0 +1,23 @@
+---
+- hosts: default
+  roles:
+    - avd-base
+    - chocolatey
+    - azure-cli
+    - az-powershell
+    # - coretek.euc.chrome
+    - terraform
+    - powershell-modules
+    - vscode
+    - git
+    - kube
+    - python
+    - putty
+    - dotnet
+    - az-functions
+    - teams
+    - chrome
+    # - fslogix - Need to setup TF first
+    - optimization
+    # - stig
+    - AVD-Cleanup

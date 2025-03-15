@@ -1,0 +1,8 @@
+---
+- name: Install Kubernetes Tools
+  win_chocolatey:
+    name:
+    - kubernetes-cli
+    - kubernetes-helm
+    - azure-kubelogin
+    state: present

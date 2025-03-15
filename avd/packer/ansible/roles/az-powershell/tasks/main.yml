@@ -1,0 +1,5 @@
+---
+- name: Install AzPowershell Cmdlets
+  win_chocolatey:
+    name: az.powershell
+    state: present

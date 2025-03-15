@@ -1,0 +1,19 @@
+---
+- name: Change power plan to high performance
+  community.windows.win_power_plan:
+    name: high performance
+
+- name: Create application shortcut
+  community.windows.win_shortcut:
+    src: '{{ item.src }}'
+    dest: 'C:\Users\Public\Desktop\{{ item.name }}.lnk'
+    icon: '{{ item.src }},0'
+  loop:
+    - { name: 'Microsoft Edge', src: 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' }
+
+- name: Redirect Timezone
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services
+    name: fEnableTimeZoneRedirection
+    data: 1
+    type: dword

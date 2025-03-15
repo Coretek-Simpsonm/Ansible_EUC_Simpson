@@ -1,0 +1,22 @@
+- name: Download VDOT
+  ansible.windows.win_get_url:
+    url: https://github.com/The-Virtual-Desktop-Team/Virtual-Desktop-Optimization-Tool/archive/refs/heads/main.zip
+    dest: C:\temp\vdot.zip
+
+- name: Unzip VDOT
+  community.windows.win_unzip:
+    src: C:\temp\vdot.zip
+    dest: C:\temp
+
+- name: Update Config
+  ansible.windows.win_copy:
+    src: AppxPackages.json
+    dest: C:\temp\Virtual-Desktop-Optimization-Tool-main\2009\ConfigurationFiles\AppxPackages.json
+
+- name: Execute Optimizations script
+  win_shell: .\Windows_VDOT.ps1 -Optimizations All -Verbose -AcceptEula
+  args:
+    chdir: C:\temp\Virtual-Desktop-Optimization-Tool-main
+
+- name: Reboot
+  ansible.windows.win_reboot:

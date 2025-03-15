@@ -1,0 +1,14 @@
+---
+- name: Delete C:\temp folder
+  ansible.windows.win_file:
+    path: C:\temp
+    state: absent
+
+- name: Install all Windows updates and reboot as many times as needed
+  ansible.windows.win_updates:
+    category_names:
+      - SecurityUpdates
+      - CriticalUpdates
+      - UpdateRollups
+    reboot: true
+    reboot_timeout: 3600

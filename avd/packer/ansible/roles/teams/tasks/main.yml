@@ -1,0 +1,7 @@
+- name: Copy Teams Bootstrapper
+  ansible.windows.win_copy:
+    src: teamsbootstrapper.exe
+    dest: C:\temp\
+
+- name: Install New Teams
+  ansible.windows.win_shell: C:\temp\teamsbootstrapper.exe -p

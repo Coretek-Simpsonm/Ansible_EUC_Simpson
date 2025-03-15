@@ -1,0 +1,7 @@
+---
+- name: Install .NET 8.0 SDK
+  win_chocolatey:
+    name: dotnet-8.0-sdk
+    state: present
+    choco_args:
+    - --ignore-checksums

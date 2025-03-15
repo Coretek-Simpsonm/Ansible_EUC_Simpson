@@ -1,0 +1,7 @@
+---
+- name: Install Azure Functions Core Tools
+  win_chocolatey:
+    name: azure-functions-core-tools
+    state: present
+    choco_args:
+    - --ignore-checksums

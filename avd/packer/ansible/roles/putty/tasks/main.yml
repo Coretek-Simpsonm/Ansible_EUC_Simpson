@@ -1,0 +1,3 @@
+- name: Install Putty
+  win_chocolatey:
+    name: putty

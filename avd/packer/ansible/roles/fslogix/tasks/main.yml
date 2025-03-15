@@ -1,0 +1,63 @@
+---
+- name: Create Scripts Folder
+  win_file:
+    path: 'C:\scripts'
+    state: directory
+
+- name: Create Temp Folder
+  win_file:
+    path: 'C:\Temp'
+    state: directory
+
+- name: Install FSlogix
+  win_chocolatey:
+    name: fslogix
+    state: present
+    choco_args:
+    - --ignore-checksums
+
+- name: Create FSLogix Registry File from Template
+  ansible.windows.win_template:
+    src: fslogix-profiles.reg.j2
+    dest: C:\Temp\FSLogix.reg
+  vars:
+    unc_path: "{{ lookup('env','FSLOGIX_SHARE_UNC') }}"
+
+- name: Compare and Merge FSLogix Registry File
+  community.windows.win_regmerge:
+    path: C:\Temp\FSlogix.reg
+    compare_to:
+      - HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Apps
+      - HKEY_LOCAL_MACHINE\SOFTWARE\FSLogix\Profile
+      - HKEY_LOCAL_MACHINE\SOFTWARE\Policies\FSLogix\ODFC
+
+- name: Add VHDLocations
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\FSLogix\Profiles
+    name: VHDLocations
+    data: ["{{ unc_path }}"]
+    type: multistring
+  vars:
+    storage_account_name: "{{ lookup('env','STORAGE_ACCOUNT_NAME') }}"
+    unc_path: "\\\\{{ storage_account_name }}.file.core.usgovcloudapi.net\\fslogix"
+
+- name: Create Map Script
+  ansible.windows.win_template:
+    src: map.ps1.j2
+    dest: C:\scripts\map.ps1
+  vars:
+    sa_name: "{{ lookup('env','STORAGE_ACCOUNT_NAME') }}"
+    sa_key: "{{ lookup('env','STORAGE_ACCOUNT_KEY') }}"
+
+- name: FSLogix Scheduled Task
+  community.windows.win_scheduled_task:
+    name: Net Use Scheduled Task
+    description: Maps FSLogix Share as SYSTEM
+    actions:
+    - path: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+      arguments: -ExecutionPolicy Unrestricted -NonInteractive -File C:\scripts\map.ps1
+    triggers:
+    - type: boot
+    username: SYSTEM
+    run_level: highest
+    state: present

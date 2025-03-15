@@ -1,0 +1,24 @@
+name: 'Packer Deployment'
+
+on:
+  pull_request:
+    paths:
+      - 'avd/packer/**'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image Version'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  Windows-11:
+    uses: coretek/Ansible_EUC/.github/workflows/packer-check-job.yml@main
+    with:
+      build-template: avd-win11.pkr.hcl
+      version: ${{ github.event.inputs.version }}
+    secrets: inherit
