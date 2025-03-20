@@ -112,7 +112,7 @@ source "azure-arm" "avd_w11" {
   shared_image_gallery_destination {
     subscription        = "${var.subscription_id}"
     gallery_name        = "SimpsonGallery"
-    image_name          = "avd_win11"
+    image_name          = "2025.03.18"
     replication_regions = ["eastus"]
     resource_group      = "RG_Simpson_Ansible"
     image_version       = var.image_version
